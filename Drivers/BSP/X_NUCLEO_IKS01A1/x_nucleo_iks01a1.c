@@ -173,40 +173,6 @@ DrvStatusTypeDef LSM6DS3_Sensor_IO_ITConfig( void )
 
 
 /**
- * @brief  Configures sensor interrupts interface for LPS22HB sensor.
- * @param  None
- * @retval COMPONENT_OK in case of success
- * @retval COMPONENT_ERROR in case of failure
- */
-DrvStatusTypeDef LPS22HB_Sensor_IO_ITConfig( void )
-{
-
-  /* At the moment this feature is only implemented for LPS22HB */
-  GPIO_InitTypeDef GPIO_InitStructureInt1;
-  /* Enable INT1 GPIO clock */
-  M_INT1_GPIO_CLK_ENABLE();
-
-  /* Configure GPIO PINs to detect Interrupts */
-  GPIO_InitStructureInt1.Pin = M_INT1_PIN;
-  GPIO_InitStructureInt1.Mode = GPIO_MODE_IT_RISING;
-#if ((defined (USE_STM32F4XX_NUCLEO)) || (defined (USE_STM32L0XX_NUCLEO)) || (defined (USE_STM32L4XX_NUCLEO)))
-  GPIO_InitStructureInt1.Speed = GPIO_SPEED_FAST;
-#endif
-
-#if (defined (USE_STM32L1XX_NUCLEO))
-  GPIO_InitStructureInt1.Speed = GPIO_SPEED_MEDIUM;
-#endif
-  GPIO_InitStructureInt1.Pull  = GPIO_NOPULL;
-  HAL_GPIO_Init(M_INT1_GPIO_PORT, &GPIO_InitStructureInt1);
-
-  /* Enable and set EXTI Interrupt priority */
-  HAL_NVIC_SetPriority(M_INT1_EXTI_IRQn, 0x00, 0x00);
-  HAL_NVIC_EnableIRQ(M_INT1_EXTI_IRQn);
-
-  return COMPONENT_OK;
-}
-
-/**
  * @}
  */
 

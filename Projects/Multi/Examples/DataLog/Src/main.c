@@ -89,9 +89,6 @@ static void RTC_Handler(TMsg *Msg);
 static void Accelero_Sensor_Handler(TMsg *Msg);
 static void Gyro_Sensor_Handler(TMsg *Msg);
 static void Magneto_Sensor_Handler(TMsg *Msg);
-static void Pressure_Sensor_Handler(TMsg *Msg);
-static void Humidity_Sensor_Handler(TMsg *Msg);
-static void Temperature_Sensor_Handler(TMsg *Msg);
 
 /* Private functions ---------------------------------------------------------*/
 /**
@@ -161,12 +158,6 @@ int main(void)
     
     RTC_Handler(&Msg);
     
-    Pressure_Sensor_Handler(&Msg);
-    
-    Humidity_Sensor_Handler(&Msg);
-    
-    Temperature_Sensor_Handler(&Msg);
-    
     Accelero_Sensor_Handler(&Msg);
     
     Gyro_Sensor_Handler(&Msg);
@@ -211,12 +202,6 @@ static void initializeAllSensors(void)
   BSP_GYRO_Init( GYRO_SENSORS_AUTO, &GYRO_handle );
   /* Force to use LIS3MDL */
   BSP_MAGNETO_Init( LIS3MDL_0, &MAGNETO_handle );
-  /* Force to use HTS221 */
-  BSP_HUMIDITY_Init( HTS221_H_0, &HUMIDITY_handle );
-  /* Force to use HTS221 */
-  BSP_TEMPERATURE_Init( HTS221_T_0, &TEMPERATURE_handle );
-  /* Try to use LPS25HB DIL24 if present, otherwise use LPS25HB on board */
-  BSP_PRESSURE_Init( PRESSURE_SENSORS_AUTO, &PRESSURE_handle );
 }
 
 /**
@@ -229,9 +214,6 @@ static void enableAllSensors(void)
   BSP_ACCELERO_Sensor_Enable( ACCELERO_handle );
   BSP_GYRO_Sensor_Enable( GYRO_handle );
   BSP_MAGNETO_Sensor_Enable( MAGNETO_handle );
-  BSP_HUMIDITY_Sensor_Enable( HUMIDITY_handle );
-  BSP_TEMPERATURE_Sensor_Enable( TEMPERATURE_handle );
-  BSP_PRESSURE_Sensor_Enable( PRESSURE_handle );
 }
 
 /**
@@ -401,104 +383,6 @@ static void Magneto_Sensor_Handler(TMsg *Msg)
   }
 }
 
-
-/**
- * @brief  Handles the PRESSURE sensor data getting/sending
- * @param  Msg the PRESSURE part of the stream
- * @retval None
- */
-static void Pressure_Sensor_Handler(TMsg *Msg)
-{
-  int32_t d1, d2;
-  uint8_t status = 0;
-  
-  if(BSP_PRESSURE_IsInitialized(PRESSURE_handle, &status) == COMPONENT_OK && status == 1)
-  {
-    BSP_PRESSURE_Get_Press(PRESSURE_handle, &PRESSURE_Value);
-    floatToInt(PRESSURE_Value, &d1, &d2, 2);
-    
-    if ( DataLoggerActive )
-    {
-      if(Sensors_Enabled & PRESSURE_SENSOR)
-      {
-        Serialize(&Msg->Data[7], d1, 2);
-        Serialize(&Msg->Data[9], d2, 2);
-      }
-    }
-    
-    else if ( AutoInit )
-    {
-      sprintf(dataOut, "PRESS: %d.%02d\n", (int)d1, (int)d2);
-      HAL_UART_Transmit(&UartHandle, (uint8_t*)dataOut, strlen(dataOut), 5000);
-    }
-  }
-}
-
-
-/**
- * @brief  Handles the HUMIDITY sensor data getting/sending
- * @param  Msg the HUMIDITY part of the stream
- * @retval None
- */
-static void Humidity_Sensor_Handler(TMsg *Msg)
-{
-  int32_t d1, d2;
-  uint8_t status = 0;
-  
-  if(BSP_HUMIDITY_IsInitialized(HUMIDITY_handle, &status) == COMPONENT_OK && status == 1)
-  {
-    BSP_HUMIDITY_Get_Hum(HUMIDITY_handle, &HUMIDITY_Value);
-    floatToInt(HUMIDITY_Value, &d1, &d2, 2);
-    
-    if ( DataLoggerActive )
-    {
-      if(Sensors_Enabled & HUMIDITY_SENSOR)
-      {
-        Serialize(&Msg->Data[13], d1, 1);
-        Serialize(&Msg->Data[14], d2, 1);
-      }
-    }
-    
-    else if ( AutoInit )
-    {
-      sprintf(dataOut, "HUM: %d.%02d\n", (int)d1, (int)d2);
-      HAL_UART_Transmit(&UartHandle, (uint8_t*)dataOut, strlen(dataOut), 5000);
-    }
-  }
-}
-
-
-/**
- * @brief  Handles the TEMPERATURE sensor data getting/sending
- * @param  Msg the TEMPERATURE part of the stream
- * @retval None
- */
-static void Temperature_Sensor_Handler(TMsg *Msg)
-{
-  int32_t d3, d4;
-  uint8_t status = 0;
-  
-  if(BSP_TEMPERATURE_IsInitialized(TEMPERATURE_handle, &status) == COMPONENT_OK && status == 1)
-  {
-    BSP_TEMPERATURE_Get_Temp(TEMPERATURE_handle, &TEMPERATURE_Value);
-    floatToInt(TEMPERATURE_Value, &d3, &d4, 2);
-    
-    if ( DataLoggerActive )
-    {
-      if(Sensors_Enabled & TEMPERATURE_SENSOR)
-      {
-        Serialize(&Msg->Data[11], d3, 1);
-        Serialize(&Msg->Data[12], d4, 1);
-      }
-    }
-    
-    else if ( AutoInit )
-    {
-      sprintf(dataOut, "TEMP: %d.%02d\n", (int)d3, (int)d4);
-      HAL_UART_Transmit(&UartHandle, (uint8_t*)dataOut, strlen(dataOut), 5000);
-    }
-  }
-}
 
 
 /**

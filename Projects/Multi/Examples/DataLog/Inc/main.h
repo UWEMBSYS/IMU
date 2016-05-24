@@ -49,9 +49,6 @@ extern "C" {
 #include "x_nucleo_iks01a1_accelero.h"
 #include "x_nucleo_iks01a1_gyro.h"
 #include "x_nucleo_iks01a1_magneto.h"
-#include "x_nucleo_iks01a1_humidity.h"
-#include "x_nucleo_iks01a1_temperature.h"
-#include "x_nucleo_iks01a1_pressure.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

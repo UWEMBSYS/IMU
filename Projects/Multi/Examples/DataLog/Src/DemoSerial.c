@@ -175,43 +175,7 @@ int HandleMSG(TMsg *Msg)
       Msg->Len = 3 + 4;
       UART_SendMsg(Msg);
       return 1;
-      
-    case CMD_LPS25HB_Init:
-      if (Msg->Len < 3) return 0;
-
-      BUILD_REPLY_HEADER( Msg );
         
-      BSP_PRESSURE_Get_Instance( PRESSURE_handle, &instance );
-        
-      switch (instance)
-      {
-        case LPS25HB_P_0:
-          Serialize_s32(&Msg->Data[3], 1, 4);
-          Msg->Len = 3 + 4;
-          break;
-        case LPS25HB_P_1:
-          Serialize_s32(&Msg->Data[3], 2, 4);
-          Msg->Len = 3 + 4;
-          break;
-        case LPS22HB_P_0:
-          Serialize_s32(&Msg->Data[3], 3, 4);
-          Msg->Len = 3 + 4;
-          break;
-        default:
-          break;
-      }
-      UART_SendMsg(Msg);
-      return 1;
-      
-    case CMD_HTS221_Init:
-      if (Msg->Len < 3) return 0;
-
-      BUILD_REPLY_HEADER( Msg ); 
-      Serialize_s32(&Msg->Data[3], 1, 4);
-      Msg->Len = 3 + 4;
-      UART_SendMsg(Msg);
-      return 1;
-      
     case CMD_LSM6DSO_Init:
       if (Msg->Len < 3) return 0;
 

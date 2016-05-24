@@ -66,9 +66,6 @@ extern "C" {
 #include "accelerometer.h"
 #include "gyroscope.h"
 #include "magnetometer.h"
-#include "humidity.h"
-#include "temperature.h"
-#include "pressure.h"
 
 /** @addtogroup BSP BSP
  * @{
